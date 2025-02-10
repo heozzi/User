@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -90,6 +92,17 @@ public class UserController {
             return ResponseEntity.ok("멤버 추가 성공");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // 그룹 멤버 조회
+    @GetMapping("group/{gid}/members")
+    public ResponseEntity<List<UserDto>> getGroupMembers(@PathVariable Long gid) {
+        try {
+            List<UserDto> members = groupService.getGroupMembers(gid);
+            return ResponseEntity.ok(members);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 

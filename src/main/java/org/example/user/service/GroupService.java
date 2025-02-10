@@ -2,6 +2,7 @@ package org.example.user.service;
 
 import jakarta.transaction.Transactional;
 import org.example.user.dto.GroupDto;
+import org.example.user.dto.UserDto;
 import org.example.user.entity.GroupEntity;
 import org.example.user.entity.GroupMembershipEntity;
 import org.example.user.entity.UserEntity;
@@ -10,6 +11,9 @@ import org.example.user.repository.GroupRepository;
 import org.example.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
@@ -60,5 +64,20 @@ public class GroupService {
         membership.setRole(role);
 
         groupMembershipRepository.save(membership);
+    }
+
+    // 그룹 멤버 조회 메서드
+    public List<UserDto> getGroupMembers(Long gid) {
+        List<GroupMembershipEntity> memberships = groupMembershipRepository.findByGroup_Gid(gid);
+
+        return memberships.stream()
+                .map(membership -> {
+                    UserDto userDto = new UserDto();
+                    userDto.setUid(membership.getUser().getUid());
+                    userDto.setUserName(membership.getUser().getUsername());
+                    userDto.setEmail(membership.getUser().getEmail());
+                    return userDto;
+                })
+                .collect(Collectors.toList());
     }
 }
