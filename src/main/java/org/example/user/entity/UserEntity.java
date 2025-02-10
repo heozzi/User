@@ -72,4 +72,8 @@ public class UserEntity implements UserDetails {
     public boolean isEnabled() {
         return enable;
     }
+
+    public String getUserRealName() {
+        return userName;
+    }
 }

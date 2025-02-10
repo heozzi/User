@@ -1,7 +1,9 @@
 package org.example.user.service;
 
+import jakarta.transaction.Transactional;
 import org.example.user.dto.UserDto;
 import org.example.user.entity.UserEntity;
+import org.example.user.repository.GroupMembershipRepository;
 import org.example.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,7 +27,9 @@ public class UserService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
     @Autowired
-    private JavaMailSender mailSender; // 자바 메일 전송 라이브러리
+    private JavaMailSender mailSender;
+    @Autowired
+    private GroupMembershipRepository groupMembershipRepository;
 
     // 회원가입 메소드
     public void createUser(UserDto userDto) {
@@ -102,20 +106,24 @@ public class UserService {
     }
 
     // 회원탈퇴 메소드
+    @Transactional
     public void signoutUser(UserDto userDto) {
-        // 1. 이메일과 비밀번호로 사용자 검증
+        // 1. 이메일로 사용자 찾기
         UserEntity userEntity = userRepository.findByEmail(userDto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // 2. 비밀번호 일치 여부 확인
+        // 2. 비밀번호 검증
         if (!passwordEncoder.matches(userDto.getPassword(), userEntity.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 3. 사용자 삭제
+        // 3. 사용자가 속한 모든 그룹에서 탈퇴
+        groupMembershipRepository.deleteByUser(userEntity);
+
+        // 4. 사용자 삭제
         userRepository.delete(userEntity);
 
-        // 4. Redis 토큰 삭제 (이메일 인증 관련 토큰이 있다면)
+        // 5. Redis 인증 토큰 삭제
         redisTemplate.delete(userEntity.getEmail());
     }
 }

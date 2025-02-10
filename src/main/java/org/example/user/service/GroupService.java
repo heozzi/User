@@ -72,10 +72,11 @@ public class GroupService {
 
         return memberships.stream()
                 .map(membership -> {
+                    UserEntity user = membership.getUser();
                     UserDto userDto = new UserDto();
-                    userDto.setUid(membership.getUser().getUid());
-                    userDto.setUserName(membership.getUser().getUsername());
-                    userDto.setEmail(membership.getUser().getEmail());
+                    userDto.setUid(user.getUid());
+                    userDto.setUserName(user.getUserRealName());
+                    userDto.setEmail(user.getEmail());
                     return userDto;
                 })
                 .collect(Collectors.toList());
