@@ -107,4 +107,30 @@ public class UserController {
     }
 
     // 프로필
+    @GetMapping("/profile")
+    public ResponseEntity<?> getProfile(@RequestHeader("X-Auth-User") String email) {
+        try {
+            UserDto userProfile = userService.getProfile(email);
+            return ResponseEntity.ok(userProfile);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류: " + e.getMessage());
+        }
+    }
+
+    // 특정 사용자 프로필 조회 (관리자 또는 같은 그룹 멤버만 조회 가능)
+    @GetMapping("/profile/{uid}")
+    public ResponseEntity<?> getUserProfile(
+            @PathVariable Long uid,
+            @RequestHeader("X-Auth-User") String email) {
+        try {
+            UserDto userProfile = userService.getUserProfile(uid, email);
+            return ResponseEntity.ok(userProfile);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 오류: " + e.getMessage());
+        }
+    }
 }

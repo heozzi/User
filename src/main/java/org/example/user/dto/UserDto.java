@@ -3,6 +3,7 @@ package org.example.user.dto;
 import lombok.Data;
 import lombok.ToString;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.example.user.entity.UserEntity;
 
 @Data
 @ToString
@@ -18,4 +19,14 @@ public class UserDto {
     private String email;
 
     private String role = "ROLE_USER";
+
+    // 프로필 조회용 생성자 추가
+    public static UserDto fromEntity(UserEntity entity) {
+        UserDto dto = new UserDto();
+        dto.setUid(entity.getUid());
+        dto.setUserName(entity.getUserRealName());
+        dto.setEmail(entity.getEmail());
+        dto.setRole(entity.getRoles());
+        return dto;
+    }
 }

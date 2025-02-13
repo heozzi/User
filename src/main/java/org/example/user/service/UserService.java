@@ -2,6 +2,7 @@ package org.example.user.service;
 
 import jakarta.transaction.Transactional;
 import org.example.user.dto.UserDto;
+import org.example.user.entity.GroupMembershipEntity;
 import org.example.user.entity.UserEntity;
 import org.example.user.repository.GroupMembershipRepository;
 import org.example.user.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -126,4 +128,55 @@ public class UserService {
         // 5. Redis 인증 토큰 삭제
         redisTemplate.delete(userEntity.getEmail());
     }
+
+    // 자신의 프로필 조회
+    public UserDto getProfile(String email) {
+        UserEntity userEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        return UserDto.fromEntity(userEntity);
+    }
+
+    // 특정 사용자의 프로필 조회
+    public UserDto getUserProfile(Long uid, String requestingUserEmail) {
+        // 요청한 사용자 확인
+        UserEntity requestingUser = userRepository.findByEmail(requestingUserEmail)
+                .orElseThrow(() -> new IllegalArgumentException("요청한 사용자를 찾을 수 없습니다."));
+
+        // 조회 대상 사용자 확인
+        UserEntity targetUser = userRepository.findById(uid)
+                .orElseThrow(() -> new IllegalArgumentException("조회 대상 사용자를 찾을 수 없습니다."));
+
+        // 권한 체크 로직 (예: 같은 그룹 멤버인지 확인)
+        if (!hasViewPermission(requestingUser, targetUser)) {
+            throw new IllegalArgumentException("해당 사용자의 프로필을 조회할 권한이 없습니다.");
+        }
+
+        return UserDto.fromEntity(targetUser);
+    }
+
+    // 프로필 조회 권한 확인
+    private boolean hasViewPermission(UserEntity requestingUser, UserEntity targetUser) {
+        // 1. 자기 자신의 프로필인 경우
+        if (requestingUser.getUid().equals(targetUser.getUid())) {
+            return true;
+        }
+
+        // 2. 관리자인 경우
+        if (requestingUser.getRoles().contains("ROLE_ADMIN")) {
+            return true;
+        }
+
+        // 3. 같은 그룹의 멤버인 경우
+        List<GroupMembershipEntity> requestingUserGroups = groupMembershipRepository.findByUser(requestingUser);
+        List<GroupMembershipEntity> targetUserGroups = groupMembershipRepository.findByUser(targetUser);
+
+        return requestingUserGroups.stream()
+                .anyMatch(requestingGroup ->
+                        targetUserGroups.stream()
+                                .anyMatch(targetGroup ->
+                                        requestingGroup.getGroup().getGid().equals(targetGroup.getGroup().getGid())
+                                )
+                );
+    }
+
 }
