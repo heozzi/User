@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
@@ -132,5 +133,13 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("서버 오류: " + e.getMessage());
         }
+    }
+
+    // 테스트용
+    @PostMapping("/checkemail")
+    public Long checkemail(@RequestBody UserDto userDto) {
+        System.out.println("이메일 pid 확인 "+userDto.getEmail());
+        Optional<UserEntity> data =userRepository.findByEmail(userDto.getEmail());
+        return data.get().getUid();
     }
 }
