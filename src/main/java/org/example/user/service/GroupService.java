@@ -26,8 +26,14 @@ public class GroupService {
     @Autowired
     private GroupMembershipRepository groupMembershipRepository;
 
+    // 그룹 생성 시 중복 그룹명 체크
     @Transactional
     public void createGroup(GroupDto groupDto) {
+        // 이미 존재하는 그룹명 확인
+        if (groupRepository.existsByGroupName(groupDto.getGroupName())) {
+            throw new IllegalArgumentException("이미 존재하는 그룹명입니다.");
+        }
+
         // 그룹 생성자(owner) 확인
         UserEntity owner = userRepository.findById(groupDto.getOwnerId())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
