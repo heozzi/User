@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class FollowEventPublisher {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper; // JSON 변환용
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public FollowEventPublisher(KafkaTemplate<String, String> kafkaTemplate, ObjectMapper objectMapper) {
@@ -17,17 +17,18 @@ public class FollowEventPublisher {
         this.objectMapper = objectMapper;
     }
 
-    public void publishFollowEvent(String followerId, String followeeId) {
+    public void publishFollowEvent(String followerId, String followeeId, String action) {
         try {
             // ✅ JSON 형식으로 Kafka 메시지 전송
             FollowRequest followRequest = new FollowRequest();
             followRequest.setFollowerId(followerId);
             followRequest.setFolloweeId(followeeId);
+            followRequest.setAction(action);
 
             String jsonMessage = objectMapper.writeValueAsString(followRequest);
             kafkaTemplate.send("follow-topic", jsonMessage);
 
-            System.out.println("팔로우 이벤트 발행: " + jsonMessage);
+            System.out.println("Kafka 메시지 발행: " + jsonMessage);
         } catch (Exception e) {
             e.printStackTrace();
         }
