@@ -48,6 +48,7 @@ public class FollowController {
             }
 
             // ✅ Kafka를 통해 팔로우 이벤트 발행 (action: "follow")
+
             followEventPublisher.publishFollowEvent(followRequest.getFollowerId(), followRequest.getFolloweeId(), "follow");
 
             return ResponseEntity.ok("Successfully followed user " + followRequest.getFolloweeId());
