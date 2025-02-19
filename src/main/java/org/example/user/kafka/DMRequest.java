@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FollowRequest {
-    private String followerId;
-    private String followeeId;
-    private String action;
+public class DMRequest {
+    private String senderId;
+    private String receiverId;
+    private String content;
 }

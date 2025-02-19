@@ -1,6 +1,7 @@
 package org.example.user.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.user.kafka.FollowRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -19,18 +20,16 @@ public class FollowEventPublisher {
 
     public void publishFollowEvent(String followerId, String followeeId, String action) {
         try {
-            // ✅ JSON 형식으로 Kafka 메시지 전송
-            FollowRequest followRequest = new FollowRequest();
-            followRequest.setFollowerId(followerId);
-            followRequest.setFolloweeId(followeeId);
-            followRequest.setAction(action);
-
+            // FollowRequest 객체 생성 (User 마이크로서비스에서 정의)
+            FollowRequest followRequest = new FollowRequest(followerId, followeeId, action);
+            // JSON 문자열로 변환
             String jsonMessage = objectMapper.writeValueAsString(followRequest);
-            kafkaTemplate.send("follow-topic", jsonMessage);
-
-            System.out.println("Kafka 메시지 발행: " + jsonMessage);
+            // "follow" 토픽에 메시지 발행
+            kafkaTemplate.send("follow", jsonMessage);
+            System.out.println("Kafka Follow 메시지 발행: " + jsonMessage);
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println("Follow 이벤트 Kafka 발행 실패");
         }
     }
 }
