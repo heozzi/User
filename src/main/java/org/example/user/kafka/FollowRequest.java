@@ -11,4 +11,5 @@ public class FollowRequest {
     private String followerId;
     private String followeeId;
     private String action;
+    //형식 수정
 }
