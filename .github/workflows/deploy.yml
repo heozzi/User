@@ -1,0 +1,22 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main  # main 브랜치에 푸시될 때마다 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # 실행 환경: Ubuntu
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2  # 코드 체크아웃
+
+      - name: SSH to EC2 and deploy
+        run: |
+          ssh -i ${HOME}/private_key.pem ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+            cd /path/to/your/app
+            git pull origin main
+            ./deploy.sh  # 배포 스크립트 실행
+          EOF
