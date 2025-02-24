@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # 코드 체크아웃
+        uses: actions/checkout@v2  # 코드 체크아웃,
 
       - name: SSH to EC2 and deploy
         run: |
