@@ -3,20 +3,29 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main  # main 브랜치에 푸시될 때마다 실행
+      - main
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # 실행 환경: Ubuntu
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # 코드 체크아웃,
+        uses: actions/checkout@v2
+
+      - name: Set up SSH key
+        run: echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
+        # 개인 키를 private_key.pem 파일로 저장
+
+      - name: Set up permissions
+        run: chmod 600 private_key.pem
+        # 개인 키 파일의 권한을 설정
 
       - name: SSH to EC2 and deploy
         run: |
-          ssh -i ${HOME}/private_key.pem ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
+          ssh -i private_key.pem ec2-user@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             cd /path/to/your/app
             git pull origin main
-            ./deploy.sh  # 배포 스크립트 실행
+            ./deploy.sh
           EOF
+        # EC2에 SSH로 접속하여 배포 작업을 수행
