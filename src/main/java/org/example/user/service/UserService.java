@@ -8,10 +8,13 @@ import org.example.user.repository.GroupMembershipRepository;
 import org.example.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +25,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class UserService {
+    @Autowired
+    private RestTemplate restTemplate;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -119,14 +124,36 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 3. 사용자가 속한 모든 그룹에서 탈퇴
-        groupMembershipRepository.deleteByUser(userEntity);
+        // 3. 사용자의 UID 가져오기
+        Long uid = userEntity.getUid();
 
-        // 4. 사용자 삭제
-        userRepository.delete(userEntity);
+        try {
+            // 4. Post 서비스에 사용자 관련 게시글 및 댓글 삭제 요청
+            // Post 서비스 포트는 실제 환경에 맞게 수정 필요
+            try {
+                String postServiceUrl = "http://localhost:8081/post/deleteByUser/" + uid;
+                restTemplate.delete(postServiceUrl);
+                System.out.println("[회원탈퇴] 사용자 " + uid + "의 게시글 및 댓글 삭제 완료");
+            } catch (Exception e) {
+                // 게시글 서비스 호출 실패 시에도 회원탈퇴는 진행
+                System.err.println("[회원탈퇴] 게시글 삭제 중 오류 발생: " + e.getMessage());
+            }
 
-        // 5. Redis 인증 토큰 삭제
-        redisTemplate.delete(userEntity.getEmail());
+            // 5. 사용자가 속한 모든 그룹에서 탈퇴
+            groupMembershipRepository.deleteByUser(userEntity);
+            System.out.println("[회원탈퇴] 사용자 " + uid + "의 그룹 멤버십 삭제 완료");
+
+            // 6. 사용자 삭제
+            userRepository.delete(userEntity);
+            System.out.println("[회원탈퇴] 사용자 " + uid + " 삭제 완료");
+
+            // 7. Redis 인증 토큰 삭제
+            redisTemplate.delete(userEntity.getEmail());
+            System.out.println("[회원탈퇴] 사용자 " + uid + "의 Redis 토큰 삭제 완료");
+
+        } catch (Exception e) {
+            throw new RuntimeException("회원 탈퇴 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
     }
 
     // 자신의 프로필 조회
