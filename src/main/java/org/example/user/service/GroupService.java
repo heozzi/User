@@ -12,6 +12,7 @@ import org.example.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,5 +87,23 @@ public class GroupService {
                     return userDto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    // ID가 그룹 속한지 테스트
+    public List<Long> checkGroupMembers(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        List<GroupMembershipEntity> memberships = groupMembershipRepository.findByUser(user);
+
+        if (memberships.isEmpty()) {
+            return List.of();
+        }
+        List<Long> groupIds = new ArrayList<>();
+        for (GroupMembershipEntity membership : memberships) {
+            System.out.println(membership.getGroup().getGid());
+            groupIds.add(membership.getGroup().getGid());
+        }
+        return groupIds;
+
     }
 }
