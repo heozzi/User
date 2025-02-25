@@ -142,4 +142,13 @@ public class UserController {
         Optional<UserEntity> data =userRepository.findByEmail(userDto.getEmail());
         return data.get().getUid();
     }
+
+    // 그룹 속한지 테스트
+    @GetMapping("groupCheck/")
+    public List<Long> checkGroupMembers(
+            @RequestParam String email) {
+
+        List<Long> result = groupService.checkGroupMembers(email);
+        return result;
+    }
 }
