@@ -28,4 +28,4 @@ jobs:
             git pull origin main
             ./deploy.sh
           EOF
-        # EC2에 SSH로 접속하여 배포 작업을 수행
+        # EC2에 SSH로 접속하여 배포 작업을 수행.
