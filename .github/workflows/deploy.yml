@@ -8,7 +8,7 @@ jobs:
   cicd-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Github Repository내 파일들 checkout(불러오기) 수행
+      - name: Github Repository 내 파일들 checkout(불러오기) 수행
         uses: actions/checkout@v4
 
       # JDK 17 버전 설치
@@ -19,7 +19,7 @@ jobs:
           java-version: '17'
       - name: application.properties 동적 생성
         run : |
-          echo "${{secrets.APPLICATION_PRO }}" > ./src/main/resources/application.yml
+          echo "${{secrets.APPLICATION_PRO }}" > ./src/main/resources/application.properties # yml 파일을 properties
 
       - name: 단위 테스트 및 빌드
         run: |
