@@ -82,7 +82,7 @@ public class UserService {
         redisTemplate.opsForValue().set(token,
                 userEntity.getEmail(), 6, TimeUnit.HOURS);
         // 3. URL 구성 -> 가입한 사용자의 이메일에서 인증메일에 전송된 링크
-        String url = "http://localhost:8080/user/vaild?token=" + token;
+        String url = "http://34.210.64.115:8080/user/vaild?token=" + token;
         // 4. 메일 전송 (받는 사람주소, 제목, 내용)
         sendMail( userEntity.getEmail(), "Email 인증", "링크를 눌러서 인증: " + url );
     }
@@ -132,7 +132,7 @@ public class UserService {
             // 4. Post 서비스에 사용자 관련 게시글 및 댓글 삭제 요청
             // Post 서비스 포트는 실제 환경에 맞게 수정 필요
             try {
-                String postServiceUrl = "http://localhost:8081/post/deleteByUser/" + uid;
+                String postServiceUrl = "http://35.86.77.149:8081/post/deleteByUser/" + uid;
                 restTemplate.delete(postServiceUrl);
                 System.out.println("[회원탈퇴] 사용자 " + uid + "의 게시글 및 댓글 삭제 완료");
             } catch (Exception e) {

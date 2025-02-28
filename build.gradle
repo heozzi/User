@@ -52,7 +52,7 @@ dependencies {
 
     // redis, 토큰 저장 및 조회
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'redis.clients:jedis:5.1.0'
+//    implementation 'redis.clients:jedis:5.1.0'
 
     // 리액티브 웹(spring-boot-starter-webflux) <-> MVC 웹(spring-boot-starter-web)
     implementation 'org.springframework.boot:spring-boot-starter-web'

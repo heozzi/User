@@ -1,8 +1,10 @@
 package org.example.user.redis;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -11,14 +13,26 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
     // 빈을 통해서 레디스 연동 구성
-
     // 레디스와 연동(결) 관리하는 객체를 빈으로 구성
+
+    @Value("${spring.data.redis.host}")
+    private String host;
+
+    @Value("${spring.data.redis.port}")
+    private int port;
+
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
+
+        configuration.setHostName(host);
+        configuration.setPort(port);
+
+
         // 연결 클라이언트 객체를 생성 반환
         // (*)LettuceConnectionFactory, JedisConnectionFactory
         // 환경 설정 정보에 있는 내용을 기반으로 연결
-        return new LettuceConnectionFactory();
+        return new LettuceConnectionFactory(configuration);
     }
 
     // 레디스 데이터를 처리하는 객체를 빈으로 구성
