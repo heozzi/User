@@ -3,7 +3,7 @@ name: User_CI/cD
 on:
   push:
     branches:
-      - main
+      - master
 jobs:
   cicd-deploy:
     runs-on: ubuntu-latest
