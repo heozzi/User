@@ -144,11 +144,11 @@ public class UserController {
     }
 
     // 그룹 속한지 테스트
-    @GetMapping("groupCheck/")
+    @GetMapping("/groupCheck")
     public List<Long> checkGroupMembers(
             @RequestParam String email) {
-
         List<Long> result = groupService.checkGroupMembers(email);
+        System.out.println(result);
         return result;
     }
 }

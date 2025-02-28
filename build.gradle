@@ -52,6 +52,7 @@ dependencies {
 
     // redis, 토큰 저장 및 조회
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'redis.clients:jedis:5.1.0'
 
     // 리액티브 웹(spring-boot-starter-webflux) <-> MVC 웹(spring-boot-starter-web)
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -84,6 +85,10 @@ dependencies {
     // 구글 메일 활용 -> 서비스 신청개념 -> 구글 계정 -> 보안 -> 검색(앱 비밀번호) -> 앱 생성 -> 비번발급
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    //
+
+
 
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
