@@ -135,7 +135,7 @@ public class UserController {
         }
     }
 
-    // 테스트용
+    // 테스트
     @PostMapping("/checkemail")
     public Long checkemail(@RequestBody UserDto userDto) {
         System.out.println("이메일 pid 확인 "+userDto.getEmail());
