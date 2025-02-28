@@ -19,7 +19,7 @@ jobs:
           java-version: '17'
       - name: application.properties 동적 생성
         run : |
-          echo "${{secrets.APPLICATION_PRO }}" > ./src/main/resources/application.properties # yml 파일을 properties
+          echo "${{secrets.APPLICATION_PRO }}" > ./src/main/resources/application.properties
 
       - name: 단위 테스트 및 빌드
         run: |
